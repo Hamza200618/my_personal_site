@@ -1,0 +1,59 @@
+{
+  "projects": [
+    {
+      "name": "ExamMate AI",
+      "type": "AI-Powered Exam Preparation Platform",
+      "status": "Production Ready",
+      "description": "An AI-powered exam preparation platform combining machine learning, OCR, and LLM integration. Generates practice questions, evaluates handwritten answers automatically, and provides personalized performance analytics.",
+      "technologies": ["Python", "Flask", "MySQL", "Claude AI", "Groq", "Machine Learning", "OCR", "React", "Tailwind CSS"],
+      "features": ["AI Tutor", "OCR Answer Checking", "Quiz Generator", "ML Predictions", "Analytics", "Authentication", "Dashboard"],
+      "highlights": [
+        "AI-powered question generation from any topic",
+        "OCR-based handwritten answer evaluation",
+        "ML models predict exam scores and topic readiness",
+        "Claude AI + Groq integration for LLM features"
+      ],
+      "link": "/products/exammate-ai"
+    },
+    {
+      "name": "Smart Campus Resource & Complaint Management System",
+      "type": "Campus Management System",
+      "status": "Completed",
+      "description": "A comprehensive campus management platform that streamlines resource allocation, complaint tracking, and administrative workflows for educational institutions.",
+      "technologies": ["React", "TypeScript", "Flask", "MySQL", "JWT", "Tailwind CSS"],
+      "features": ["Resource Booking", "Complaint Tracking", "Role-based Access", "Dashboard", "Notifications", "Reports"],
+      "highlights": ["Won Semester Project Exhibition", "Centralized resource management", "Automated complaint lifecycle"],
+      "link": "/products"
+    },
+    {
+      "name": "NexusAI Company Portfolio",
+      "type": "Company Portfolio Website",
+      "status": "Production",
+      "description": "A premium company portfolio website for NexusAI, showcasing AI products, services, and the vision behind the brand.",
+      "technologies": ["React", "TypeScript", "Tailwind CSS", "Framer Motion", "Vite"],
+      "features": ["Hero Section", "Product Showcase", "Services", "About", "Contact"],
+      "highlights": ["Modern premium design", "Performance optimized", "Showcases NexusAI brand"],
+      "link": "https://nexusai-company-portfolio-pjns.vercel.app"
+    },
+    {
+      "name": "Artora",
+      "type": "AI Creative Platform",
+      "status": "In Development",
+      "description": "An AI-powered creative platform that generates and enhances digital artwork using machine learning models.",
+      "technologies": ["Python", "TensorFlow", "PyTorch", "React", "Flask"],
+      "features": ["Image Generation", "Style Transfer", "Enhancement", "Gallery", "Export"],
+      "highlights": ["ML models for creative generation", "Style transfer capabilities"],
+      "link": "/products"
+    },
+    {
+      "name": "CareGroup",
+      "type": "Healthcare Management Platform",
+      "status": "Research",
+      "description": "A healthcare management platform that connects patients, providers, and administrators through a unified digital experience.",
+      "technologies": ["React", "TypeScript", "Flask", "MySQL", "JWT"],
+      "features": ["Appointments", "Patient Records", "Provider Dashboard", "Authentication"],
+      "highlights": ["Unified healthcare experience", "Role-based access control"],
+      "link": "/products"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "faqs": [
+    {
+      "question": "What services do you provide?",
+      "answer": "I specialize in AI-powered applications, intelligent automation, chatbots, CRM systems, full-stack web applications, REST API development, and machine learning solutions."
+    },
+    {
+      "question": "Can you build AI applications?",
+      "answer": "Yes. I build AI applications using Python, Flask, Claude AI, Groq, and machine learning frameworks — from intelligent document processing to predictive analytics."
+    },
+    {
+      "question": "Do you work remotely?",
+      "answer": "Absolutely. I work fully remotely and collaborate with clients across different time zones using modern communication and project management tools."
+    },
+    {
+      "question": "Can you join startup teams?",
+      "answer": "Yes. As Co-Founder of NexusAI, I understand startup challenges and can contribute as a technical founder, lead developer, or AI specialist."
+    },
+    {
+      "question": "Do you provide long-term support?",
+      "answer": "Yes. I provide ongoing maintenance, feature development, and technical support for all projects I build."
+    },
+    {
+      "question": "How can I see your previous work?",
+      "answer": "Explore the Featured Products section which showcases ExamMate AI, Smart Campus System, NexusAI Portfolio, Artora, and CareGroup with detailed case studies."
+    }
+  ]
+}

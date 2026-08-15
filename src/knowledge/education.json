@@ -1,0 +1,32 @@
+{
+  "education": [
+    {
+      "degree": "Bachelor of Science",
+      "field": "Cloud Computing & Information Sciences",
+      "institution": "Sir Syed University of Engineering & Technology",
+      "period": "Expected 2028",
+      "status": "Expected Graduation"
+    },
+    {
+      "degree": "Advanced Diploma",
+      "field": "ACCPAI",
+      "institution": "Aptech Pakistan",
+      "period": "October 2024 - October 2027",
+      "status": "In Progress"
+    },
+    {
+      "degree": "Intermediate",
+      "field": "Pre-Engineering",
+      "institution": "Government Science College 11-A",
+      "period": "Completed 2025",
+      "status": "Completed"
+    },
+    {
+      "degree": "Matriculation",
+      "field": "Science",
+      "institution": "AL-Hameed Secondary School",
+      "period": "Completed 2023",
+      "status": "Completed"
+    }
+  ]
+}

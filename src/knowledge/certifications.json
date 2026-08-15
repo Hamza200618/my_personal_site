@@ -1,0 +1,32 @@
+{
+  "certifications": [
+    {
+      "title": "Basics of Python",
+      "organization": "UniAthena",
+      "issuer": "Cambridge International Qualifications",
+      "year": "2024"
+    },
+    {
+      "title": "Basics of Machine Learning Algorithms",
+      "organization": "UniAthena",
+      "issuer": "Cambridge International Qualifications",
+      "year": "2024"
+    },
+    {
+      "title": "Google Soft Skills Program",
+      "organization": "Google",
+      "issuer": "Pakistan Freelancers Association",
+      "year": "2024"
+    },
+    {
+      "title": "SMEC'26 - Certificate of Participant",
+      "organization": "Web Development",
+      "year": "2026"
+    },
+    {
+      "title": "Winner - Semester Project Exhibition",
+      "organization": "Smart Campus Resource & Complaint Management System",
+      "year": "2026"
+    }
+  ]
+}

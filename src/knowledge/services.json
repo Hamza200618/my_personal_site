@@ -1,0 +1,49 @@
+{
+  "services": [
+    {
+      "name": "AI Applications",
+      "description": "End-to-end AI-powered applications that bring intelligence into real workflows.",
+      "technologies": ["Python", "Claude AI", "Groq", "Machine Learning", "NLP"]
+    },
+    {
+      "name": "AI Agents",
+      "description": "Autonomous agents that reason, plan, and execute tasks using modern LLMs and tool-calling.",
+      "technologies": ["Claude AI", "Groq", "Prompt Engineering", "Python"]
+    },
+    {
+      "name": "Chatbots",
+      "description": "Conversational AI assistants that understand context and deliver helpful responses.",
+      "technologies": ["LLM Integration", "NLP", "Python", "REST APIs"]
+    },
+    {
+      "name": "Full Stack Web Applications",
+      "description": "Complete web platforms from database to interface — designed, built, and deployed.",
+      "technologies": ["React", "TypeScript", "Flask", "MySQL", "Tailwind CSS"]
+    },
+    {
+      "name": "CRM Systems",
+      "description": "Customer relationship management systems that organize contacts and drive growth.",
+      "technologies": ["React", "Flask", "MySQL", "Authentication", "JWT"]
+    },
+    {
+      "name": "Automation Solutions",
+      "description": "Custom automation that eliminates repetitive work and streamlines operations.",
+      "technologies": ["Python", "REST APIs", "Machine Learning", "OCR"]
+    },
+    {
+      "name": "Machine Learning Solutions",
+      "description": "Practical ML systems — trained, evaluated, and deployed to solve business problems.",
+      "technologies": ["scikit-learn", "TensorFlow", "PyTorch", "Python"]
+    },
+    {
+      "name": "REST API Development",
+      "description": "Clean, secure, and well-documented APIs that power web and mobile applications.",
+      "technologies": ["Flask", "JWT", "SQLAlchemy", "REST APIs"]
+    },
+    {
+      "name": "LLM Integration",
+      "description": "Seamlessly wiring large language models into products for intelligent features.",
+      "technologies": ["Claude AI", "Groq", "Prompt Engineering", "Python"]
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "skills": {
+    "aiMachineLearning": [
+      "Artificial Intelligence",
+      "Machine Learning",
+      "NLP",
+      "OCR",
+      "Prompt Engineering",
+      "LLM Integration",
+      "Claude AI",
+      "Groq"
+    ],
+    "mlFrameworks": [
+      "Python",
+      "scikit-learn",
+      "TensorFlow",
+      "PyTorch",
+      "Sentence Transformers",
+      "spaCy",
+      "NLTK"
+    ],
+    "frontend": [
+      "React",
+      "TypeScript",
+      "JavaScript",
+      "HTML5",
+      "CSS3",
+      "Tailwind CSS",
+      "Bootstrap",
+      "Responsive Design"
+    ],
+    "backend": [
+      "Flask",
+      "REST APIs",
+      "Authentication",
+      "JWT",
+      "SQLAlchemy"
+    ],
+    "database": [
+      "MySQL",
+      "SQL Server",
+      "Database Design",
+      "Relational Databases"
+    ],
+    "cloudDeployment": [
+      "Render",
+      "Vercel",
+      "GitHub",
+      "GitHub Actions",
+      "Firebase (Future)",
+      "Azure (Learning)"
+    ],
+    "tools": [
+      "VS Code",
+      "Git",
+      "GitHub Desktop",
+      "Postman",
+      "Figma (Basic)"
+    ]
+  }
+}

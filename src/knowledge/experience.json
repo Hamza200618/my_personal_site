@@ -1,0 +1,17 @@
+{
+  "experience": [
+    {
+      "role": "Co-Founder",
+      "company": "NexusAI",
+      "period": "2026 - Present",
+      "description": "Leading the development of AI-powered applications, intelligent automation systems, chatbots, CRM platforms, and custom software solutions.",
+      "highlights": ["AI Product Development", "Full Stack Development", "Technical Architecture", "Client Solutions", "Team Collaboration"]
+    },
+    {
+      "role": "Freelance Full Stack Developer",
+      "company": "Independent Clients",
+      "period": "2024 - Present",
+      "description": "Designed and developed responsive websites, AI-powered applications, Flask backends, and database-driven systems for independent clients."
+    }
+  ]
+}
