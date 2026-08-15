@@ -35,12 +35,12 @@ src/
 ├── types/               — TypeScript types
 └── utils/               — utility functions
 api/
-├── chat.ts              — Vercel serverless function for the AI assistant
+├── chat.mjs              — Vercel serverless function for the AI assistant
 └── lib/
-    ├── systemPrompt.ts  — Hamza AI system prompt (server-side only)
-    └── buildContext.ts  — builds the knowledge context from src/knowledge
+    ├── systemPrompt.mjs  — Hamza AI system prompt (server-side only)
+    └── buildContext.mjs  — builds the knowledge context from src/knowledge
 server/
-└── chat.mjs             — local dev API server (wraps api/chat.ts)
+└── chat.mjs             — local dev API server (wraps api/chat.mjs)
 scripts/
 └── dev.mjs              — starts API + Vite together for `npm run dev`
 ```
@@ -48,7 +48,7 @@ scripts/
 ## 🔧 Environment Variables
 
 The Groq API key is **server-side only**. It is read by the serverless
-function (`api/chat.ts`) via `process.env.GROQ_API_KEY` and is **never**
+function (`api/chat.mjs`) via `process.env.GROQ_API_KEY` and is **never**
 bundled into the browser. Do NOT prefix it with `VITE_`.
 
 Create a `.env` file in the project root (copy from `.env.example`):
@@ -59,7 +59,7 @@ GROQ_API_KEY=your_groq_api_key_here
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `GROQ_API_KEY` | Yes (for AI) | Groq API key, read server-side by `api/chat.ts` |
+| `GROQ_API_KEY` | Yes (for AI) | Groq API key, read server-side by `api/chat.mjs` |
 | `GROQ_MODEL` | No | Model override (defaults to `llama-3.3-70b-versatile`) |
 
 ## 🤖 Hamza AI Architecture
@@ -67,7 +67,7 @@ GROQ_API_KEY=your_groq_api_key_here
 ```
 React/Vite frontend
         ↓  POST /api/chat  (messages only — no API key)
-Vercel Serverless Function (api/chat.ts)
+Vercel Serverless Function (api/chat.mjs)
         ↓  process.env.GROQ_API_KEY
 Groq API (streaming SSE)
         ↓  response
@@ -121,7 +121,7 @@ npm run format
 
 Netlify also supports serverless functions, but this project's function
 currently targets the Vercel Node runtime. For Netlify, add the same
-`GROQ_API_KEY` environment variable and adapt `api/chat.ts` to a Netlify
+`GROQ_API_KEY` environment variable and adapt `api/chat.mjs` to a Netlify
 function format, or host on Vercel.
 
 ### GitHub Pages
@@ -136,7 +136,7 @@ endpoint (e.g. a separate Vercel/Netlify function) if needed.
 - **Theme**: Edit CSS variables in `src/styles/global.css`
 - **Branding**: Edit `src/constants/index.ts`
 - **AI Assistant**: Edit the knowledge base in `src/knowledge/*.json` and the
-  system prompt in `api/lib/systemPrompt.ts`
+  system prompt in `api/lib/systemPrompt.mjs`
 
 ## 📝 Maintenance
 

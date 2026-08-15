@@ -1,6 +1,5 @@
-import type { IncomingMessage, ServerResponse } from 'node:http';
-import { SYSTEM_PROMPT } from './lib/systemPrompt.ts';
-import { buildPromptContext } from './lib/buildContext.ts';
+import { SYSTEM_PROMPT } from './lib/systemPrompt.mjs';
+import { buildPromptContext } from './lib/buildContext.mjs';
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODEL = process.env.GROQ_MODEL ?? 'llama-3.3-70b-versatile';
@@ -9,15 +8,12 @@ const MAX_MESSAGES = 24;
 const MAX_CONTENT_LENGTH = 4000;
 const MAX_BODY_BYTES = 256_000;
 
-interface ClientMessage {
-  role: 'user' | 'assistant';
-  content: string;
-}
-
-/** Read and parse the request body, with a size guard. */
-function readJsonBody(req: IncomingMessage): Promise<unknown> {
+/**
+ * Read and parse the request body, with a size guard.
+ */
+function readJsonBody(req) {
   return new Promise((resolve, reject) => {
-    const chunks: Buffer[] = [];
+    const chunks = [];
     let size = 0;
 
     req.on('data', (chunk) => {
@@ -53,15 +49,15 @@ function readJsonBody(req: IncomingMessage): Promise<unknown> {
  *   server-side and can never be supplied by the client).
  * - Content must be a string and is capped in length and count.
  */
-function sanitizeMessages(input: unknown): ClientMessage[] | null {
+function sanitizeMessages(input) {
   if (!Array.isArray(input) || input.length === 0) return null;
 
-  const messages: ClientMessage[] = [];
+  const messages = [];
   const slice = input.slice(0, MAX_MESSAGES);
 
   for (const item of slice) {
     if (typeof item !== 'object' || item === null) return null;
-    const { role, content } = item as { role?: unknown; content?: unknown };
+    const { role, content } = item;
     if (role !== 'user' && role !== 'assistant') return null;
     if (typeof content !== 'string') return null;
     const trimmed = content.trim();
@@ -72,7 +68,7 @@ function sanitizeMessages(input: unknown): ClientMessage[] | null {
   return messages.length > 0 ? messages : null;
 }
 
-function writeJson(res: ServerResponse, status: number, payload: { error: string }): void {
+function writeJson(res, status, payload) {
   if (res.writableEnded) return;
   res.statusCode = status;
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -80,7 +76,7 @@ function writeJson(res: ServerResponse, status: number, payload: { error: string
   res.end(JSON.stringify(payload));
 }
 
-function errorFromGroqStatus(status: number): { status: number; message: string } {
+function errorFromGroqStatus(status) {
   if (status === 401 || status === 403) {
     return { status: 500, message: 'The AI service is not configured correctly on the server.' };
   }
@@ -92,6 +88,7 @@ function errorFromGroqStatus(status: number): { status: number; message: string 
   }
   return { status: 502, message: 'Failed to reach the AI service.' };
 }
+
 /**
  * POST /api/chat — Vercel serverless function.
  *
@@ -103,13 +100,13 @@ function errorFromGroqStatus(status: number): { status: number; message: string 
  *
  * GROQ_API_KEY is read from server-side env only and never reaches the browser.
  */
-export default async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
+export default async function handler(req, res) {
   if (req.method !== 'POST') {
     writeJson(res, 405, { error: 'Method not allowed. Use POST.' });
     return;
   }
 
-  let body: unknown;
+  let body;
   try {
     body = await readJsonBody(req);
   } catch (error) {
@@ -122,7 +119,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   }
 
   const input =
-    typeof body === 'object' && body !== null ? (body as { messages?: unknown }).messages : undefined;
+    typeof body === 'object' && body !== null ? (body.messages ?? undefined) : undefined;
   const messages = sanitizeMessages(input);
   if (!messages) {
     writeJson(res, 400, {
@@ -137,7 +134,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   }
 
   // Build the system prompt + knowledge context entirely on the server.
-  let systemMessage: string;
+  let systemMessage;
   try {
     systemMessage = `${SYSTEM_PROMPT}\n\n${buildPromptContext()}`;
   } catch {
@@ -145,17 +142,17 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     return;
   }
 
-  const groqMessages: Array<{ role: string; content: string }> = [
+  const groqMessages = [
     { role: 'system', content: systemMessage },
     ...messages,
   ];
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
-  const abortOnClose = (): void => controller.abort();
+  const abortOnClose = () => controller.abort();
   req.on('close', abortOnClose);
 
-  let upstream: Response;
+  let upstream;
   try {
     upstream = await fetch(GROQ_API_URL, {
       method: 'POST',

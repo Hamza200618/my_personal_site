@@ -6,68 +6,17 @@ import path from 'node:path';
  * Reads the same JSON knowledge files used by the site (src/knowledge/*)
  * and formats them into a structured prompt context. Building the context
  * here keeps the raw knowledge (and any sensitive details) off the client.
+ *
+ * NOTE: On Vercel, process.cwd() resolves to the function root (/var/task)
+ * where the repo lives, so the tracked src/knowledge JSON files are found.
+ * vercel.json explicitly includes src/knowledge/** in the function output.
  */
 
 const KNOWLEDGE_DIR = path.join(process.cwd(), 'src', 'knowledge');
 
-interface ProfileKnowledge {
-  name: string;
-  role: string;
-  tagline: string;
-  location: string;
-  languages: string[];
-  bio: string;
-  contact: Record<string, string>;
-}
-
-interface ProjectKnowledge {
-  name: string;
-  type: string;
-  status: string;
-  description: string;
-  technologies: string[];
-  features: string[];
-  highlights: string[];
-  link: string;
-}
-
-interface ExperienceKnowledge {
-  role: string;
-  company: string;
-  period: string;
-  description: string;
-  highlights?: string[];
-}
-
-interface EducationKnowledge {
-  degree: string;
-  field: string;
-  institution: string;
-  period: string;
-  status: string;
-}
-
-interface CertificationKnowledge {
-  title: string;
-  organization: string;
-  issuer?: string;
-  year: string;
-}
-
-interface ServiceKnowledge {
-  name: string;
-  description: string;
-  technologies: string[];
-}
-
-interface FaqKnowledge {
-  question: string;
-  answer: string;
-}
-
-function readJson<T>(fileName: string): T {
+function readJson(fileName) {
   const raw = fs.readFileSync(path.join(KNOWLEDGE_DIR, fileName), 'utf-8');
-  return JSON.parse(raw) as T;
+  return JSON.parse(raw);
 }
 
 /**
@@ -75,11 +24,11 @@ function readJson<T>(fileName: string): T {
  * formats them into a structured context string, and returns it.
  * This context is injected into the system prompt on the server.
  */
-export function buildPromptContext(): string {
-  const sections: string[] = [];
+export function buildPromptContext() {
+  const sections = [];
 
   // Profile
-  const profile = readJson<ProfileKnowledge>('profile.json');
+  const profile = readJson('profile.json');
   sections.push(
     `## PROFILE\nName: ${profile.name}\nRole: ${profile.role}\nTagline: ${profile.tagline}\nLocation: ${profile.location}\nLanguages: ${profile.languages.join(', ')}\nBio: ${profile.bio}\nContact: ${Object.entries(profile.contact)
       .map(([key, value]) => `${key}: ${value}`)
@@ -87,7 +36,7 @@ export function buildPromptContext(): string {
   );
 
   // Projects
-  const projects = readJson<{ projects: ProjectKnowledge[] }>('projects.json');
+  const projects = readJson('projects.json');
   sections.push(
     `## PROJECTS\n${projects.projects
       .map(
@@ -98,7 +47,7 @@ export function buildPromptContext(): string {
   );
 
   // Skills
-  const skills = readJson<{ skills: Record<string, string[]> }>('skills.json');
+  const skills = readJson('skills.json');
   sections.push(
     `## SKILLS\n${Object.entries(skills.skills)
       .map(([category, items]) => `${category}: ${items.join(', ')}`)
@@ -106,7 +55,7 @@ export function buildPromptContext(): string {
   );
 
   // Experience
-  const experience = readJson<{ experience: ExperienceKnowledge[] }>('experience.json');
+  const experience = readJson('experience.json');
   sections.push(
     `## EXPERIENCE\n${experience.experience
       .map(
@@ -117,7 +66,7 @@ export function buildPromptContext(): string {
   );
 
   // Education
-  const education = readJson<{ education: EducationKnowledge[] }>('education.json');
+  const education = readJson('education.json');
   sections.push(
     `## EDUCATION\n${education.education
       .map((e) => `- ${e.degree} in ${e.field} at ${e.institution} (${e.period}, ${e.status})`)
@@ -125,7 +74,7 @@ export function buildPromptContext(): string {
   );
 
   // Certifications
-  const certifications = readJson<{ certifications: CertificationKnowledge[] }>('certifications.json');
+  const certifications = readJson('certifications.json');
   sections.push(
     `## CERTIFICATIONS\n${certifications.certifications
       .map((c) => `- ${c.title} from ${c.organization}${c.issuer ? ` (${c.issuer})` : ''} (${c.year})`)
@@ -133,7 +82,7 @@ export function buildPromptContext(): string {
   );
 
   // Services
-  const services = readJson<{ services: ServiceKnowledge[] }>('services.json');
+  const services = readJson('services.json');
   sections.push(
     `## SERVICES\n${services.services
       .map((s) => `- ${s.name}: ${s.description} (Technologies: ${s.technologies.join(', ')})`)
@@ -141,7 +90,7 @@ export function buildPromptContext(): string {
   );
 
   // FAQs
-  const faqs = readJson<{ faqs: FaqKnowledge[] }>('faq.json');
+  const faqs = readJson('faq.json');
   sections.push(
     `## FAQS\n${faqs.faqs.map((f) => `Q: ${f.question}\nA: ${f.answer}`).join('\n')}`,
   );
