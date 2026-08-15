@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { sendGroqMessage, type GroqMessage } from '@/services/assistant/groq';
-import { buildPromptContext } from '@/utils/contextBuilder';
-import { SYSTEM_PROMPT } from '@/services/assistant/prompt';
+import { sendChatMessage, type ChatMessagePayload } from '@/services/assistant/groq';
 import type { ChatMessage } from '@/types';
 
 interface UseChatOptions {
@@ -9,8 +7,10 @@ interface UseChatOptions {
 }
 
 /**
- * useChat — hook that manages assistant chat state and sends messages to Groq.
- * Builds the system prompt with knowledge context, streams responses, and tracks conversation history.
+ * useChat — hook that manages assistant chat state and sends messages
+ * through the serverless /api/chat endpoint. The system prompt and
+ * knowledge context are injected server-side; the client only sends
+ * user/assistant messages.
  */
 export function useChat({ onError }: UseChatOptions = {}) {
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -23,7 +23,6 @@ export function useChat({ onError }: UseChatOptions = {}) {
   const [input, setInput] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  const contextRef = useRef(buildPromptContext());
   const messagesRef = useRef<ChatMessage[]>([]);
 
   useEffect(() => {
@@ -32,21 +31,23 @@ export function useChat({ onError }: UseChatOptions = {}) {
 
   const sendMessage = useCallback(
     async (content: string) => {
-      const userMessage: ChatMessage = { role: 'user', content };
+      const trimmed = content.trim();
+      if (!trimmed) return;
+
+      const userMessage: ChatMessage = { role: 'user', content: trimmed };
       setMessages((prev) => [...prev, userMessage]);
       setIsLoading(true);
       setError(null);
 
-      const groqMessages: GroqMessage[] = [
-        { role: 'system', content: `${SYSTEM_PROMPT}\n\n${contextRef.current}` },
+      const payload: ChatMessagePayload[] = [
         ...messagesRef.current.map((m) => ({
-          role: m.role as 'user' | 'assistant',
+          role: m.role,
           content: m.content,
         })),
-        { role: 'user', content },
+        { role: 'user', content: trimmed },
       ];
 
-      const response = await sendGroqMessage(groqMessages);
+      const response = await sendChatMessage(payload);
 
       setIsLoading(false);
 
@@ -56,11 +57,12 @@ export function useChat({ onError }: UseChatOptions = {}) {
         return;
       }
 
-      const assistantMessage: ChatMessage = {
-        role: 'assistant',
-        content: response.content,
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
+      if (response.content) {
+        setMessages((prev) => [
+          ...prev,
+          { role: 'assistant', content: response.content },
+        ]);
+      }
     },
     [onError],
   );

@@ -5,7 +5,9 @@
   "type": "module",
   "description": "Premium personal AI portfolio of SK - AI & Full-Stack Developer, Co-Founder of NexusAI",
   "scripts": {
-    "dev": "vite",
+    "dev": "node scripts/dev.mjs",
+    "dev:vite": "vite",
+    "dev:api": "node --env-file-if-exists=.env server/chat.mjs",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "eslint .",

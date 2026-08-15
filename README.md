@@ -30,23 +30,54 @@ src/
 ├── knowledge/           — AI assistant knowledge base (JSON)
 ├── pages/               — route pages
 ├── routes/              — router configuration
-├── services/            — API services (Groq, etc.)
+├── services/            — API services (client-side /api/chat wrapper)
 ├── styles/              — global CSS
 ├── types/               — TypeScript types
 └── utils/               — utility functions
+api/
+├── chat.ts              — Vercel serverless function for the AI assistant
+└── lib/
+    ├── systemPrompt.ts  — Hamza AI system prompt (server-side only)
+    └── buildContext.ts  — builds the knowledge context from src/knowledge
+server/
+└── chat.mjs             — local dev API server (wraps api/chat.ts)
+scripts/
+└── dev.mjs              — starts API + Vite together for `npm run dev`
 ```
 
 ## 🔧 Environment Variables
 
-Create a `.env` file in the project root:
+The Groq API key is **server-side only**. It is read by the serverless
+function (`api/chat.ts`) via `process.env.GROQ_API_KEY` and is **never**
+bundled into the browser. Do NOT prefix it with `VITE_`.
+
+Create a `.env` file in the project root (copy from `.env.example`):
 
 ```env
-VITE_GROQ_API_KEY=your_groq_api_key_here
+GROQ_API_KEY=your_groq_api_key_here
 ```
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `VITE_GROQ_API_KEY` | Yes (for AI) | Groq API key for the Hamza AI assistant |
+| `GROQ_API_KEY` | Yes (for AI) | Groq API key, read server-side by `api/chat.ts` |
+| `GROQ_MODEL` | No | Model override (defaults to `llama-3.3-70b-versatile`) |
+
+## 🤖 Hamza AI Architecture
+
+```
+React/Vite frontend
+        ↓  POST /api/chat  (messages only — no API key)
+Vercel Serverless Function (api/chat.ts)
+        ↓  process.env.GROQ_API_KEY
+Groq API (streaming SSE)
+        ↓  response
+React Chat UI
+```
+
+- The frontend never imports the API key and never talks to `api.groq.com`.
+- The system prompt and knowledge context are injected server-side.
+- Local dev: `npm run dev` starts the Vite dev server plus a local API server;
+  Vite proxies `/api` to `http://localhost:3001`.
 
 ## 🚀 Getting Started
 
@@ -54,7 +85,11 @@ VITE_GROQ_API_KEY=your_groq_api_key_here
 # Install dependencies
 npm install
 
-# Start development server
+# One-time: create your local env file, then add your real Groq key
+copy .env.example .env        # Windows
+# cp .env.example .env        # macOS/Linux
+
+# Start the dev server (Vite + local /api/chat)
 npm run dev
 
 # Build for production
@@ -72,30 +107,36 @@ npm run format
 
 ## 🌐 Deployment
 
-### Vercel
+### Vercel (recommended)
 
 1. Push to GitHub
 2. Import project in Vercel
-3. Add `VITE_GROQ_API_KEY` to environment variables
-4. Deploy
+3. In **Project → Settings → Environment Variables**, add:
+   - Name: `GROQ_API_KEY`
+   - Value: your Groq key
+   - Apply to **Production**, **Preview**, and **Development**
+4. Deploy (Vercel automatically detects the `api/` directory as serverless functions)
 
 ### Netlify
 
-1. Build command: `npm run build`
-2. Publish directory: `dist`
-3. Add `VITE_GROQ_API_KEY` to environment variables
+Netlify also supports serverless functions, but this project's function
+currently targets the Vercel Node runtime. For Netlify, add the same
+`GROQ_API_KEY` environment variable and adapt `api/chat.ts` to a Netlify
+function format, or host on Vercel.
 
 ### GitHub Pages
 
-1. Update `vite.config.ts` with `base: '/<repo-name>/'`
-2. Build and deploy the `dist` folder
+Static hosting only — the `/api/chat` function cannot run there. Deploy the
+frontend to GitHub Pages and point the AI assistant at a hosted `/api/chat`
+endpoint (e.g. a separate Vercel/Netlify function) if needed.
 
 ## 🎨 Customization
 
 - **Content**: Edit files in `src/data/` and `src/knowledge/`
 - **Theme**: Edit CSS variables in `src/styles/global.css`
 - **Branding**: Edit `src/constants/index.ts`
-- **AI Assistant**: Edit `src/knowledge/*.json` and `src/services/assistant/prompt.ts`
+- **AI Assistant**: Edit the knowledge base in `src/knowledge/*.json` and the
+  system prompt in `api/lib/systemPrompt.ts`
 
 ## 📝 Maintenance
 

@@ -1,5 +1,6 @@
 /**
  * SYSTEM_PROMPT — the advanced system prompt for Hamza AI.
+ * Lives on the server so it can never be manipulated by the client.
  * Represents Syed Hamza Kamal professionally and prevents hallucination.
  */
 export const SYSTEM_PROMPT = `You are Hamza AI, the intelligent portfolio assistant representing Syed Hamza Kamal.

@@ -1,70 +1,76 @@
-const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const GROQ_MODEL = 'llama-3.3-70b-versatile';
+const CHAT_ENDPOINT = '/api/chat';
 const TIMEOUT_MS = 30_000;
 
-const API_KEY = import.meta.env.VITE_GROQ_API_KEY as string | undefined;
-
-export interface GroqMessage {
-  role: 'system' | 'user' | 'assistant';
+export interface ChatMessagePayload {
+  role: 'user' | 'assistant';
   content: string;
 }
 
-export interface GroqResponse {
+export interface ChatResponse {
   content: string;
   error?: string;
 }
 
+interface StreamChunk {
+  choices?: Array<{ delta?: { content?: string } }>;
+}
+
 /**
- * sendGroqMessage — sends a chat completion request to the Groq API.
- * Handles network errors, timeouts, invalid API keys, and rate limits.
+ * sendChatMessage — sends a chat request through the serverless `/api/chat`
+ * endpoint. The Groq API key never touches the browser: all API traffic
+ * flows react → /api/chat → Vercel function → Groq.
  */
-export async function sendGroqMessage(
-  messages: GroqMessage[],
+export async function sendChatMessage(
+  messages: ChatMessagePayload[],
   onToken?: (chunk: string) => void,
-): Promise<GroqResponse> {
-  if (!API_KEY) {
-    return {
-      content: '',
-      error: 'Groq API key is not configured. Please add VITE_GROQ_API_KEY to your .env file.',
-    };
+): Promise<ChatResponse> {
+  if (!Array.isArray(messages) || messages.length === 0) {
+    return { content: '', error: 'Please type a message first.' };
   }
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
+  let response: Response;
   try {
-    const response = await fetch(GROQ_API_URL, {
+    response = await fetch(CHAT_ENDPOINT, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${API_KEY}`,
       },
-      body: JSON.stringify({
-        model: GROQ_MODEL,
-        messages,
-        temperature: 0.7,
-        max_tokens: 1024,
-        stream: true,
-      }),
+      body: JSON.stringify({ messages }),
       signal: controller.signal,
     });
-
-    if (!response.ok) {
-      let message = 'Failed to reach the AI service.';
-      if (response.status === 401) message = 'Invalid API key. Please check your Groq API key.';
-      if (response.status === 429) message = 'Rate limit reached. Please try again shortly.';
-      if (response.status >= 500) message = 'The AI service is temporarily unavailable. Please try again.';
-      return { content: '', error: message };
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      return { content: '', error: 'The request timed out. Please try again.' };
     }
+    return { content: '', error: 'Network error. Please check your connection and try again.' };
+  }
+  clearTimeout(timeoutId);
 
-    const reader = response.body?.getReader();
-    if (!reader) return { content: '', error: 'Unable to read the AI response stream.' };
+  if (!response.ok) {
+    let message = 'The AI service could not process your request.';
+    try {
+      const data = (await response.json()) as { error?: unknown };
+      if (typeof data.error === 'string' && data.error) {
+        message = data.error;
+      }
+    } catch {
+      // Fall back to the generic message.
+    }
+    return { content: '', error: message };
+  }
 
-    const decoder = new TextDecoder();
-    let fullContent = '';
+  const reader = response.body?.getReader();
+  if (!reader) return { content: '', error: 'Unable to read the AI response stream.' };
 
-    // Stream chunks
-    while (true) {
+  const decoder = new TextDecoder();
+  let fullContent = '';
+
+  try {
+    for (;;) {
       const { done, value } = await reader.read();
       if (done) break;
 
@@ -78,25 +84,22 @@ export async function sendGroqMessage(
         if (data === '[DONE]') continue;
 
         try {
-          const parsed = JSON.parse(data);
+          const parsed = JSON.parse(data) as StreamChunk;
           const delta = parsed.choices?.[0]?.delta?.content;
           if (delta) {
             fullContent += delta;
             onToken?.(delta);
           }
         } catch {
-          // Skip malformed JSON chunks
+          // Skip malformed JSON chunks.
         }
       }
     }
-
-    return { content: fullContent };
-  } catch (error) {
-    if (error instanceof DOMException && error.name === 'AbortError') {
-      return { content: '', error: 'The request timed out. Please try again.' };
-    }
-    return { content: '', error: 'Network error. Please check your connection and try again.' };
+  } catch {
+    // Connection dropped mid-stream — return whatever we have.
   } finally {
-    clearTimeout(timeoutId);
+    reader.releaseLock();
   }
+
+  return { content: fullContent };
 }
