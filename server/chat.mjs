@@ -1,9 +1,9 @@
 import { createServer } from 'node:http';
-import handler from '../api/chat.mjs';
+import handler from '../api/chat.js';
 
 /**
  * Local development API server (NOT used in production).
- * Wraps the same Vercel serverless function (api/chat.mjs) so that
+ * Wraps the same Vercel serverless function (api/chat.js) so that
  * `npm run dev` can serve POST /api/chat without the Vercel CLI.
  */
 

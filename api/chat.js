@@ -1,5 +1,5 @@
-import { SYSTEM_PROMPT } from './lib/systemPrompt.mjs';
-import { buildPromptContext } from './lib/buildContext.mjs';
+import { SYSTEM_PROMPT } from './lib/systemPrompt.js';
+import { buildPromptContext } from './lib/buildContext.js';
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODEL = process.env.GROQ_MODEL ?? 'llama-3.3-70b-versatile';

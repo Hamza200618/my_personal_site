@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 /**
  * Server-side knowledge base loader.
@@ -7,12 +8,22 @@ import path from 'node:path';
  * and formats them into a structured prompt context. Building the context
  * here keeps the raw knowledge (and any sensitive details) off the client.
  *
- * NOTE: On Vercel, process.cwd() resolves to the function root (/var/task)
- * where the repo lives, so the tracked src/knowledge JSON files are found.
+ * On Vercel the project root is the function cwd, so we first try
+ * process.cwd()/src/knowledge. As a fallback we resolve relative to this
+ * module (api/lib → ../../src/knowledge) in case the cwd differs.
  * vercel.json explicitly includes src/knowledge/** in the function output.
  */
 
-const KNOWLEDGE_DIR = path.join(process.cwd(), 'src', 'knowledge');
+function resolveKnowledgeDir() {
+  const fromCwd = path.join(process.cwd(), 'src', 'knowledge');
+  if (fs.existsSync(fromCwd)) return fromCwd;
+
+  const here = path.dirname(fileURLToPath(import.meta.url)); // <root>/api/lib
+  const fromModule = path.join(here, '..', '..', 'src', 'knowledge');
+  return fromModule;
+}
+
+const KNOWLEDGE_DIR = resolveKnowledgeDir();
 
 function readJson(fileName) {
   const raw = fs.readFileSync(path.join(KNOWLEDGE_DIR, fileName), 'utf-8');

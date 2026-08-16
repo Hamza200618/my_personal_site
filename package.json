@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "engines": {
+    "node": "20.x"
+  },
   "description": "Premium personal AI portfolio of SK - AI & Full-Stack Developer, Co-Founder of NexusAI",
   "scripts": {
     "dev": "node scripts/dev.mjs",
