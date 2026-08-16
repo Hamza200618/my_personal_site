@@ -129,6 +129,13 @@ export default async function handler(req, res) {
   }
 
   if (!process.env.GROQ_API_KEY) {
+    // Server-side only. This log goes to Vercel's function logs and never
+    // exposes the key value. It confirms the exact cause when the message
+    // "The AI service is not configured on the server." appears in the UI.
+    console.error(
+      '[api/chat] GROQ_API_KEY is not set in this environment. ' +
+        'Add it under Vercel → Settings → Environment Variables (Production + Preview) and redeploy.',
+    );
     writeJson(res, 500, { error: 'The AI service is not configured on the server.' });
     return;
   }
@@ -180,6 +187,9 @@ export default async function handler(req, res) {
   if (!upstream.ok) {
     clearTimeout(timeoutId);
     req.removeListener('close', abortOnClose);
+    // Log only the status code for debugging (401/403 = bad key, 429 = rate
+    // limit, 5xx = Groq incident). The upstream body is never logged or sent.
+    console.error(`[api/chat] Groq API returned HTTP ${upstream.status}.`);
     const mapped = errorFromGroqStatus(upstream.status);
     writeJson(res, mapped.status, { error: mapped.message });
     return;
