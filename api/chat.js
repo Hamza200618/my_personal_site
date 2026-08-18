@@ -2,7 +2,7 @@ import { SYSTEM_PROMPT } from './lib/systemPrompt.js';
 import { buildPromptContext } from './lib/buildContext.js';
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const GROQ_MODEL = process.env.GROQ_MODEL ?? 'llama-3.3-70b-versatile';
+const GROQ_MODEL = process.env.GROQ_MODEL ?? 'groq/compound-mini';
 const TIMEOUT_MS = 28_000;
 const MAX_MESSAGES = 24;
 const MAX_CONTENT_LENGTH = 4000;
@@ -128,13 +128,16 @@ export default async function handler(req, res) {
     return;
   }
 
-  if (!process.env.GROQ_API_KEY) {
-    // Server-side only. This log goes to Vercel's function logs and never
-    // exposes the key value. It confirms the exact cause when the message
-    // "The AI service is not configured on the server." appears in the UI.
+  // The Groq key is read ONLY from the server-side runtime environment in
+  // Vercel. It is never sent to or readable by the browser. Trim defends
+  // against an accidentally whitespace-wrapped value in the dashboard.
+  const apiKey = (process.env.GROQ_API_KEY ?? '').trim();
+
+  if (!apiKey) {
+    // Safe diagnostic for Vercel function logs — never logs the key value.
     console.error(
-      '[api/chat] GROQ_API_KEY is not set in this environment. ' +
-        'Add it under Vercel → Settings → Environment Variables (Production + Preview) and redeploy.',
+      'GROQ_API_KEY configured: false — add GROQ_API_KEY under ' +
+        'Vercel Settings → Environment Variables (set for Production + Preview) and redeploy.',
     );
     writeJson(res, 500, { error: 'The AI service is not configured on the server.' });
     return;
@@ -165,7 +168,7 @@ export default async function handler(req, res) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
         model: GROQ_MODEL,

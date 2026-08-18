@@ -10,7 +10,7 @@ A premium personal AI portfolio for **Syed Hamza Kamal** — AI & Full-Stack Dev
 - **Framer Motion** — animations
 - **React Router** — routing
 - **React Helmet** — SEO
-- **Groq API** — AI assistant (llama-3.3-70b-versatile)
+- **Groq API** — AI assistant (`groq/compound-mini`, overridable via `GROQ_MODEL`)
 - **Lucide React** — icons
 - **React Markdown** — AI response rendering
 
@@ -60,7 +60,7 @@ GROQ_API_KEY=your_groq_api_key_here
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `GROQ_API_KEY` | Yes (for AI) | Groq API key, read server-side by `api/chat.js` |
-| `GROQ_MODEL` | No | Model override (defaults to `llama-3.3-70b-versatile`) |
+| `GROQ_MODEL` | No | Model override (defaults to `groq/compound-mini`) |
 
 ## 🤖 Hamza AI Architecture
 
