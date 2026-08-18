@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "engines": {
-    "node": "20.x"
+    "node": "24.x"
   },
   "description": "Premium personal AI portfolio of SK - AI & Full-Stack Developer, Co-Founder of NexusAI",
   "scripts": {

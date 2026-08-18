@@ -143,6 +143,12 @@ export default async function handler(req, res) {
     return;
   }
 
+  // Safe diagnostic (never logs the key value) so Vercel Function Logs
+  // confirm whether the runtime environment variable arrived for this
+  // deployment. If you see 'configured: false', the env var is not reaching
+  // the function (Vercel settings/scope issue); if 'true', the request flows.
+  console.log('GROQ_API_KEY configured: true');
+
   // Build the system prompt + knowledge context entirely on the server.
   let systemMessage;
   try {
