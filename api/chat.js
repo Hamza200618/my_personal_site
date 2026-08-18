@@ -101,6 +101,28 @@ function errorFromGroqStatus(status) {
  * GROQ_API_KEY is read from server-side env only and never reaches the browser.
  */
 export default async function handler(req, res) {
+  // Safe health/diagnostic check (GET /api/chat). Returns the live state of
+  // the deployed function — NEVER exposes any secret value. Open
+  // https://<your-domain>.vercel.app/api/chat in a browser after deploying.
+  if (req.method === 'GET') {
+    let knowledgeLoaded = true;
+    try {
+      buildPromptContext();
+    } catch {
+      knowledgeLoaded = false;
+    }
+    writeJson(res, 200, {
+      status: 'ok',
+      service: 'Hamza AI /api/chat',
+      runtime: 'nodejs',
+      nodeVersion: process.version,
+      model: GROQ_MODEL,
+      groqConfigured: Boolean((process.env.GROQ_API_KEY ?? '').trim()),
+      knowledgeLoaded,
+    });
+    return;
+  }
+
   if (req.method !== 'POST') {
     writeJson(res, 405, { error: 'Method not allowed. Use POST.' });
     return;
